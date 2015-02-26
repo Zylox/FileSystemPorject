@@ -1,0 +1,10 @@
+To build:
+cd build
+cmake ../
+make
+
+To Build Documentation API
+make doc
+
+See SAMPLE_TEST_OUTPUT for running tests and expected output
+

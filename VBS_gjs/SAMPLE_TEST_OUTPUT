@@ -1,0 +1,47 @@
+
+
+$ ./test_vbs
+
+[1]	.
+[2]	.
+[3]	.
+[4]	.
+[5]	.
+[6]	.
+[7]	.
+[8]	.
+[9]	.
+[10]	.
+[11]	.
+[12]	.
+[13]	.
+[14]	.
+[15]	.
+[16]	.
+[17]	.
+[18]	.
+vbs_write: Invalid Read Request: Success
+[19]	.
+vbs_read: Invalid Read Request, not a data block: Success
+[20]	.
+vbs_erase: Invalid Read Request: Success
+[21]	.
+[22]	.
+[23]	.
+ 23 Tests Passed!
+
+
+$ ./test_vbs_storage 
+
+[1]	.
+[2]	.
+[3]	.
+[4]	.TESTING: Showing File Differences
+343a344
+> \ No newline at end of file
+
+[5]	.
+ 5 Tests Passed!
+scottgs@ceberus:~/Documents/OperatingSystems/code_samples/VBS/build$ 
+
+
