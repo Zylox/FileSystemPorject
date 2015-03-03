@@ -9,8 +9,7 @@ add_library(vbs SHARED src/VirtualBlockStorage.c src/bitmap.c)
 # add_library(vbs STATIC src/VirtualBlockStorage.c src/bitmap.c)
 
 install(TARGETS vbs DESTINATION lib)
-install(FILES include/VirtualBlockStorage.h DESTINATION include)
-install(FILES include/bitmap.h DESINATION include)
+install(FILES include/VirtualBlockStorage.h include/bitmap.h DESTINATION include)
 	
 target_link_libraries(vbs)
 
@@ -22,15 +21,13 @@ target_link_libraries (test_vbs_storage vbs)
 
 
 # Automatic API Documentation Generate
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile @ONLY)
-add_custom_target(doc
-${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile
-WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-COMMENT "Generating API documentation with Doxygen" VERBATIM
-)
-endif(DOXYGEN_FOUND)
-
-
+#find_package(Doxygen)
+#if(DOXYGEN_FOUND)
+#configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile @ONLY)
+#add_custom_target(doc
+#${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile
+#WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#COMMENT "Generating API documentation with Doxygen" VERBATIM
+#)
+#endif(DOXYGEN_FOUND)
 
