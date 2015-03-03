@@ -11,6 +11,10 @@
 
 #define INODE_NUM 256
 
+#define FS_FIRST_BLOCK_IDX 40
+
+#define MOUNT_FAILURE -1
+
 /*
  * Gives accesses to the VBS for all functions inside this .c
  * only. The fs_mount function will provide VBS structure
@@ -46,10 +50,60 @@ static char* getDirectorysFromPath(const char* absolutePath){
 	}
 }
 
+static unsigned int calculateFileSize(Inode_t file){
+	unsigned int size = 0;
+	
+	
+}
+
 int fs_mount() {
 	
 	vbs_initialize(VBS_FILENAME);
 	virtualBlockStorage = vbs_open(VBS_FILENAME);	
+	
+	BlockType loader;
+	Inode_t rootInode;
+	
+	rootInode.fileName = "root";
+	rootInode.metaData.fileType = DIR_FILE;
+	rootInode.metaData.fileSize = sizeof(Directory_t);
+	rootInode.metaData.fileLinked = FILE_LINKED;
+	rootInode.blockPointers[0] = FS_FIRST_BLOCK_IDX;
+	inodes[0] = rootInode;
+	
+	Directory_t rootDir;
+	rootDir.size = 0;
+	FS_Block_t rootBlock;
+	rootBlock.validBytes = sizeof(Directory_t);
+	rootBlock.nextBlockIdx = 0;
+	memcpy(&(rootBlock.dataBuffer), &rootDir, sizeof(Directory_t));
+	
+	memcpy(&loader, &rootBlock, sizeof(FS_Block_t));
+	error = vbs_write(virtualBlockStorage, FS_FIRST_BLOCK_IDX, loader);
+	if(error < 0){
+		perror("error in creating root dir");
+		return MOUNT_FAILURE;
+	}
+	
+	
+	int i;
+	int inodeLoaderOffset=0;
+	short error = -1;
+	for(i = 1; i < INODES_NUM; i++){
+		inodes[i].metaData.fileLinked = FILE_UNLINKED;
+	}
+	for(i = 8; i <=39; i+=1){
+		
+		memcpy(&loader, inodes[inodeLoaderOffset], sizeof(BlockType));
+		//8 inodes per blocktype;
+		inodeLoaderOffset+=8;
+		
+		error = vbs_write(virtualBlockStorage, i, loader);
+		if(error < 0){
+			perror("error in the vbs write");
+			return MOUNT_FAILURE;
+		}
+	}
 
 	return 0;
 }

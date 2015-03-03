@@ -2,6 +2,8 @@
 #define _S15_FILESYSTEM_H
 
 #define MAX_FILENAME_LEN 63
+#define FILE_LINKED 'y'
+#define FILE_UNLINKED 'n'
 
 typedef struct {
 	char filename[MAX_FILENAME_LEN+1];  // +1 for the \0 
@@ -17,11 +19,11 @@ typedef struct {
 typedef struct {
 	FileType fileType; //1
 	unsigned int filesize; //4
-	char fileLinked;
+	char fileLinked; //1
 	//time_t timeCreated; //4 maybe
 	//time_t timeModified; //4 maybe
 	//time_t timeAccessed; //4 maybe
-	char filler[43];
+	//char filler[42];
 } FileMetadata_t;
 
 typedef struct {
@@ -37,6 +39,7 @@ typedef struct {
 } FS_Block_t;
 
 typedef enum FILE_OPTIONS {REG_FILE,DIR_FILE} FileType;
+
 
 /**
  * Makes the VBS available for use 
