@@ -62,7 +62,7 @@ int fs_unmount();
 /**
  * TODO: Fill me in with some Doxygen / JavaDoc style comments
  */
-int fs_create_file(const char* absoluteFilename, FileTypes fileType);
+int fs_create_file(const char* absoluteFilename, FileType fileType);
 
 /**
  * TODO: Fill me in with some Doxygen / JavaDoc style comments
