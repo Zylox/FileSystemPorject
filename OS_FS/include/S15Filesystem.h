@@ -5,6 +5,8 @@
 #define FILE_LINKED 'y'
 #define FILE_UNLINKED 'n'
 
+typedef enum FILE_OPTIONS {REG_FILE,DIR_FILE} FileType;
+
 typedef struct {
 	char filename[MAX_FILENAME_LEN+1];  // +1 for the \0 
 	unsigned char inodeIdx; //0 - 255 possible inodes, per specs implicitly
@@ -38,7 +40,9 @@ typedef struct {
 	unsigned short nextBlockIdx;
 } FS_Block_t;
 
-typedef enum FILE_OPTIONS {REG_FILE,DIR_FILE} FileType;
+
+
+
 
 
 /**
