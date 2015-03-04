@@ -48,7 +48,7 @@ static unsigned char firstOpenInodeIdx(){
 static int writeInodeTable(){
 	int i;
 	int inodeLoaderOffset=0;
-	error = -1;
+	int error = -1;
 	
 	BlockType loader = vbs_make_block();
 	
@@ -66,6 +66,44 @@ static int writeInodeTable(){
 	}
 	
 	return 1;
+}
+
+static Directory_t getRootDirectory(){
+	Inode_t workingFile = inodes[0];
+	BlockType vbsBlock= vbs_make_block();
+	vbsBlock = vbs_read(virtualBlockStorage, workingFile.blockPointers[0]);
+	FS_Block_t fsBlock;
+	memcpy(&fsBlock,vbsBlock.buffer,sizeof(FS_Block_t));
+	
+	Directory_t dir;
+	memcpy(&dir,fsBlock.dataBuffer[0],sizeof(Directory_t));
+	
+	return dir;
+}
+
+static int getDirectoryFromToken(const char* dirName, Directory_t currentDir, Directory_t* newDir){
+	DirectoryEntry_t* dirEntry;
+	dirEntry = currentDir.entries;
+	int i;
+	for(i = 0; i < 10; i++){
+		if(strcmp(dirName, (*dirEntry).filename)){
+			Inode_t file = inodes[inodeIdx];
+			if(file.metaData.fileType == DIR_FILE){
+				BlockType vbsBlock= vbs_make_block();
+				vbsBlock = vbs_read(virtualBlockStorage, file.blockPointers[0]);
+				FS_Block_t fsBlock;
+				memcpy(&fsBlock,vbsBlock.buffer,sizeof(FS_Block_t));
+
+				memcpy(newDir,fsBlock.dataBuffer[0],sizeof(Directory_t));
+				return 1;
+			}else{
+				perror("dirname is a file not a directory");
+				return INCORRECT_FILE_TYPE;
+			}
+		}
+	}
+	
+	return DIRECTORY_NOT_FOUND
 }
 
 // static char* getDirectorysFromPath(const char* absolutePath){
@@ -143,12 +181,12 @@ int fs_mount() {
 static int splitFileAndDirPath(const char* absoluteFilename, char* dirPath, char* filename){
 	int error=-1;
 	
-	if(*absolutePath != '/'){
+	if(*absoluteFilename != '/'){
 		perror("please start filepath with /");
 		return INVALID_PATH;
 	}
 	
-	char* afnCopy = strdup(absolutePath);
+	char* afnCopy = strdup(absoluteFilename);
 	char* token = strtok(afnCopy, "/");
 	char* nextToken;
 	Directory_t dir = get_rootDirectory();
@@ -158,7 +196,7 @@ static int splitFileAndDirPath(const char* absoluteFilename, char* dirPath, char
 		nextToken = strtok(NULL, "/");
 	}
 	int filenameSize = strlen(token);
-	dirPath = strncpy(dirPath, absolutePath, strlen(absoluteFilename) - filenameSize+1);
+	dirPath = strncpy(dirPath, absoluteFilename, strlen(absoluteFilename) - filenameSize+1);
 	char* dirPathEnd = dirPath + strlen(dirPath)-1;
 	*dirPathEnd = '\0';
 	filename = token;
@@ -220,43 +258,9 @@ int fs_create_file(const char* absoluteFilename,FileType fileType) {
 	return 0;
 }
 
-static Directory_t getRootDirectory(){
-	Inode_t workingFile = inodes[0];
-	BlockType vbsBlock= vbs_make_block();
-	vbsBlock = vbs_read(virtualBlockStorage, workingFile.blockPointers[0]);
-	FS_Block_t fsBlock;
-	memcpy(&fsBlock,vbsBlock.buffer,sizeof(FS_Block_t));
-	
-	Directory_t dir;
-	memcpy(&dir,fsBlock.dataBuffer[0],sizeof(Directory_t));
-	
-	return dir;
-}
 
-static int getDirectoryFromToken(const char* dirName, Directory_t currentDir, Directory_t* newDir){
-	DirectoryEntry_t* dirEntry;
-	dirEntry = currentDir.entries;
-	int i;
-	for(i = 0; i < 10; i++){
-		if(strcmp(dirName, (*dirEntry).filename)){
-			Inode_t file = inodes[inodeIdx];
-			if(file.metaData.fileType == DIR_FILE){
-				BlockType vbsBlock= vbs_make_block();
-				vbsBlock = vbs_read(virtualBlockStorage, file.blockPointers[0]);
-				FS_Block_t fsBlock;
-				memcpy(&fsBlock,vbsBlock.buffer,sizeof(FS_Block_t));
 
-				memcpy(newDir,fsBlock.dataBuffer[0],sizeof(Directory_t));
-				return 1;
-			}else{
-				perror("dirname is a file not a directory");
-				return INCORRECT_FILE_TYPE;
-			}
-		}
-	}
-	
-	return DIRECTORY_NOT_FOUND
-}
+
 
 int fs_get_directory (const char* absolutePath, Directory_t* directoryContents) {
 	
