@@ -292,8 +292,9 @@ int fs_get_directory (const char* absolutePath, Directory_t* directoryContents) 
 	char* tokens = strtok(afnCopy, "/");
 	
 	Directory_t dir = getRootDirectory();
+	*directoryContents = dir;
 	
-		perror("aaaa");	
+
 	while (tokens) {
 
 		if(tokens == NULL){
