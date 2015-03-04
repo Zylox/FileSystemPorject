@@ -209,7 +209,7 @@ int fs_create_file(const char* absoluteFilename,FileType fileType) {
 	if(error < 1){
 		return INVALID_PATH;
 	}
-	printf("%d\n",);
+	
 	
 	if(strlen(filename) > MAX_FILENAME_LEN){
 		perror("filename too long");
