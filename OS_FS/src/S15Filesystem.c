@@ -64,7 +64,7 @@ int fs_mount() {
 	BlockType loader;
 	Inode_t rootInode;
 	
-	strncpy(rootInode.fileName, "root");
+	strncpy(rootInode.fileName, "root", sizeof("root"));
 	rootInode.metaData.fileType = DIR_FILE;
 	rootInode.metaData.fileSize = sizeof(Directory_t);
 	rootInode.metaData.fileLinked = FILE_LINKED;
