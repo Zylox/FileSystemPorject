@@ -61,7 +61,7 @@ int fs_mount() {
 	vbs_initialize(VBS_FILENAME);
 	virtualBlockStorage = vbs_open(VBS_FILENAME);	
 	
-	BlockType loader;
+	BlockType loader = vbs_make_block();
 	Inode_t rootInode;
 	
 	strncpy(rootInode.fileName, "root", sizeof("root"));
@@ -80,7 +80,7 @@ int fs_mount() {
 	
 	short error = -1;
 	
-	memcpy(&loader, &rootBlock, sizeof(FS_Block_t));
+	memcpy(loader.buffer, &rootBlock, sizeof(FS_Block_t));
 	
 	VBS_Index idx = vbs_nextFreeBlock(virtualBlockStorage);
 	printf("%u is the next open block\n",idx);
@@ -99,7 +99,7 @@ int fs_mount() {
 	}
 	for(i = 8; i <=39; i+=1){
 		
-		memcpy(&loader, &inodes[inodeLoaderOffset], sizeof(BlockType));
+		memcpy(loader.buffer, &inodes[inodeLoaderOffset], sizeof(BlockType));
 		//8 inodes per blocktype;
 		inodeLoaderOffset+=8;
 		
