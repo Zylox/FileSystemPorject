@@ -13,8 +13,13 @@
 
 #define FS_FIRST_BLOCK_IDX 40
 
+#define NO_OPEN_INODE 0
 #define MOUNT_FAILURE -1
 #define INVALID_PATH -2
+#define DIRECTORY_NOT_FOUND -3
+#define INCORRECT_FILE_TYPE -4
+#define DIRECTORY_FULL -5
+#define FILE_CREATION_FAILURE -6
 
 /*
  * Gives accesses to the VBS for all functions inside this .c
@@ -26,18 +31,42 @@ static VBS_Type *virtualBlockStorage;
 
 static Inode_t inodes[INODE_NUM];
 
-// static unsigned char firstOpenInodeIdx(){
+static unsigned char firstOpenInodeIdx(){
 	
-	// int i;
-	////start at one because the first inode is the root always;
-	// for(i=1; i < INODE_NUM; i++){
-		// if(inodes[i].metaData.fileLinked == 0){
-			// return (unsigned char) i;
-		// }
-	// }
+	int i;
+	//start at one because the first inode is the root always;
+	for(i=1; i < INODE_NUM; i++){
+		if(inodes[i].metaData.fileLinked == 0){
+			return (unsigned char) i;
+		}
+	}
 	
-	// return 0;
-// }
+	perror("all inodes in use");
+	return NO_OPEN_INODE;
+}
+
+static int writeInodeTable(){
+	int i;
+	int inodeLoaderOffset=0;
+	error = -1;
+	
+	BlockType loader = vbs_make_block();
+	
+	for(i = 8; i <=39; i+=1){
+		
+		memcpy(loader.buffer, &inodes[inodeLoaderOffset], sizeof(BlockType));
+		//8 inodes per blocktype;
+		inodeLoaderOffset+=8;
+		
+		error = vbs_write(virtualBlockStorage, i, loader);
+		if(error < 0){
+			perror("error in the vbs write of inode table");
+			return error;
+		}
+	}
+	
+	return 1;
+}
 
 // static char* getDirectorysFromPath(const char* absolutePath){
 	
@@ -51,11 +80,11 @@ static Inode_t inodes[INODE_NUM];
 	// }
 // }
 
-static unsigned int calculateFileSize(Inode_t file){
-	unsigned int size = 0;
-	return size;
+// static unsigned int calculateFileSize(Inode_t file){
+	// unsigned int size = 0;
+	// return size;
 	
-}
+// }
 
 int fs_mount() {
 	
@@ -73,7 +102,7 @@ int fs_mount() {
 	inodes[0] = rootInode;
 	
 	Directory_t rootDir;
-	rootDir.size = 0;
+	rootDir.size = sizeof(DirectoryEntry_t);
 	FS_Block_t rootBlock;
 	rootBlock.validBytes = sizeof(Directory_t);
 	rootBlock.nextBlockIdx = 0;
@@ -111,36 +140,127 @@ int fs_mount() {
 	return 0;
 }
 
+static int splitFileAndDirPath(const char* absoluteFilename, char* dirPath, char* filename){
+	int error=-1;
+	
+	if(*absolutePath != '/'){
+		perror("please start filepath with /");
+		return INVALID_PATH;
+	}
+	
+	char* afnCopy = strdup(absolutePath);
+	char* token = strtok(afnCopy, "/");
+	char* nextToken;
+	Directory_t dir = get_rootDirectory();
+	
+	while (nextToken){
+		token = nextToken;
+		nextToken = strtok(NULL, "/");
+	}
+	int filenameSize = strlen(token);
+	dirPath = strncpy(dirPath, absolutePath, strlen(absoluteFilename) - filenameSize+1);
+	char* dirPathEnd = dirPath + strlen(dirPath)-1;
+	*dirPathEnd = '\0';
+	filename = token;
+	
+	return 1;
+}
+
 int fs_create_file(const char* absoluteFilename,FileType fileType) {
-	fs_get_directory(absoluteFilename, NULL);
-	//find first open inode;
-	// unsigned char openIdx = firstOpenInodeIdx();
-	// if(openIdx == 0){
-		// perror("no open inodes");
-		// return -1;
-	// }
+	int error = -1;
+	char* dirPath, filename;
+	error = splitFileAndDirPath(absoluteFilename, dirPath, filename);
+	if(error < 1){
+		return INVALID_PATH;
+	}
 	
-	/*typedef struct {
-		char fileName[64];
-		FileMetadata_t metaData;
-		unsigned short blockPointers[8];
-	} Inode_t;*/
+	if(strlen(filename) > MAX_FILENAME_LEN){
+		perror("filename too long");
+		return INVALID_PATH;
+	}
 	
-	// Inode_t newInode;
-	// char* afnCopy = strdup(absoluteFilename);
-	// char* tokens = strtok(afnCopy, "/");
 	
-	// while (token) {
-		
-		// token = strtok(NULL, " ");
-	// }
-	// strncpy(newInode.filename, , 64);
+	Directory_t dir;
+	error = fs_get_directory(dirPath, &dir);
+	if(error < 1){
+		return DIRECTORY_NOT_FOUND;
+	}
+	
+	int lastDirEntryIdx = dir.size/sizeof(DirectoryEntry_t);
+	if(lastDirEntryIdx > 10){
+		perror("Directory is full, no more files can be added");
+		return DIRECTORY_FULL;
+	}
+	
+	Inode_t file;
+	strncpy(file.filename, filename, strlen(filename));
+	file.metaData.fileType = fileType;
+	file.metaData.fileSize = 0;
+	file.metaData.fileLinked = FILE_LINKED;
+	
+	unsigned char inodeIdx = firstOpenInodeIdx();
+	if(inodeIdx == NO_OPEN_INODE){
+		return FILE_CREATION_FAILURE;
+	}
+	
+	DirectoryEntry_t dirEntry;
+	strncpy(dirEntry.filename, filename, strlen(filename));
+	dirEntry.inodeIdx = inodeIdx;
+	DirectoryEntry_t* insertionPoint = dir.entries+(lastDirEntryIdx);
+	*insertionPoint = dirEntry;
+	dir.size += sizeof(DirectoryEntry_t);
+	
+	inodes[inodeIdx] = file;
+	
+	error = writeInodeTable();
+	if(error < 1){
+		return error;
+	}
 	
 	return 0;
 }
 
+static Directory_t getRootDirectory(){
+	Inode_t workingFile = inodes[0];
+	BlockType vbsBlock= vbs_make_block();
+	vbsBlock = vbs_read(virtualBlockStorage, workingFile.blockPointers[0]);
+	FS_Block_t fsBlock;
+	memcpy(&fsBlock,vbsBlock.buffer,sizeof(FS_Block_t));
+	
+	Directory_t dir;
+	memcpy(&dir,fsBlock.dataBuffer[0],sizeof(Directory_t));
+	
+	return dir;
+}
+
+static int getDirectoryFromToken(const char* dirName, Directory_t currentDir, Directory_t* newDir){
+	DirectoryEntry_t* dirEntry;
+	dirEntry = currentDir.entries;
+	int i;
+	for(i = 0; i < 10; i++){
+		if(strcmp(dirName, (*dirEntry).filename)){
+			Inode_t file = inodes[inodeIdx];
+			if(file.metaData.fileType == DIR_FILE){
+				BlockType vbsBlock= vbs_make_block();
+				vbsBlock = vbs_read(virtualBlockStorage, file.blockPointers[0]);
+				FS_Block_t fsBlock;
+				memcpy(&fsBlock,vbsBlock.buffer,sizeof(FS_Block_t));
+
+				memcpy(newDir,fsBlock.dataBuffer[0],sizeof(Directory_t));
+				return 1;
+			}else{
+				perror("dirname is a file not a directory");
+				return INCORRECT_FILE_TYPE;
+			}
+		}
+	}
+	
+	return DIRECTORY_NOT_FOUND
+}
 
 int fs_get_directory (const char* absolutePath, Directory_t* directoryContents) {
+	
+	int error=-1;
 	
 	if(*absolutePath != '/'){
 		perror("please start filepath with /");
@@ -149,18 +269,26 @@ int fs_get_directory (const char* absolutePath, Directory_t* directoryContents) 
 	
 	char* afnCopy = strdup(absolutePath);
 	char* tokens = strtok(afnCopy, "/");
-	char* temp;
 	
+	Directory_t dir = get_rootDirectory();
 	
 	while (tokens) {
 		
-		temp = strtok(NULL, " ");
-		if(temp == NULL){
+		if(tokens == NULL){
 			return 1;
 		}
+		//putting the result in directoryContents then moving it into dir
+		// gives the side effect of even on an incomplete return, the most
+		// complete filepath possible is given.
+		error = getDirectoryFromToken(tokens, dir, directoryContents);
+		if(error < 1){
+			return error;
+		}else{
+			dir = *directoryContents;
+		}
 		
-		printf("path line for %s: %s\n", absolutePath,tokens);
-		tokens = temp;
+		//printf("path line for %s: %s\n", absolutePath,tokens);
+		tokens = strtok(NULL, "/");
 		
 	}
 	
