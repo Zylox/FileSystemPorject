@@ -294,9 +294,8 @@ int fs_get_directory (const char* absolutePath, Directory_t* directoryContents) 
 	Directory_t dir = getRootDirectory();
 	*directoryContents = dir;
 	
-
 	while (tokens) {
-
+		printf("asdfasdfasdf");
 		if(tokens == NULL){
 			return 1;
 		}
