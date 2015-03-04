@@ -112,7 +112,7 @@ int fs_mount() {
 }
 
 int fs_create_file(const char* absoluteFilename,FileType fileType) {
-	fs_get_directroy(absoluteFilename, NULL);
+	fs_get_directory(absoluteFilename, NULL);
 	//find first open inode;
 	// unsigned char openIdx = firstOpenInodeIdx();
 	// if(openIdx == 0){
