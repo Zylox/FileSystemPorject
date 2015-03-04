@@ -229,9 +229,10 @@ int fs_create_file(const char* absoluteFilename,FileType fileType) {
 	Directory_t dir;
 	error = fs_get_directory(dirPath, &dir);
 	if(error < 1){
+		printf("5\n");
 		return DIRECTORY_NOT_FOUND;
 	}
-	printf("5\n");
+
 	
 	int lastDirEntryIdx = dir.size/sizeof(DirectoryEntry_t);
 	if(lastDirEntryIdx > 10){
