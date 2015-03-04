@@ -264,6 +264,7 @@ int fs_create_file(const char* absoluteFilename,FileType fileType) {
 	
 	error = writeInodeTable();
 	if(error < 1){
+		perror("inodewritefailedsomehow");
 		return error;
 	}
 	printf("2\n");
