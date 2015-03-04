@@ -204,7 +204,7 @@ static int splitFileAndDirPath(const char* absoluteFilename, char* dirPath, char
 
 int fs_create_file(const char* absoluteFilename,FileType fileType) {
 	int error = -1;
-	char* dirPath, filename;
+	char *dirPath, *filename;
 	error = splitFileAndDirPath(absoluteFilename, dirPath, filename);
 	if(error < 1){
 		return INVALID_PATH;
