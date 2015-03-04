@@ -304,6 +304,7 @@ int fs_get_directory (const char* absolutePath, Directory_t* directoryContents) 
 		// complete filepath possible is given.
 		error = getDirectoryFromToken(tokens, dir, directoryContents);
 		if(error < 1){
+			perror("getting directory from token failed");
 			return error;
 		}else{
 			dir = *directoryContents;
