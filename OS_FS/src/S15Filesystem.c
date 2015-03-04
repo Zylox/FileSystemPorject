@@ -81,7 +81,9 @@ int fs_mount() {
 	short error = -1;
 	
 	memcpy(&loader, &rootBlock, sizeof(FS_Block_t));
-	VBS_Index idx = 8;
+	
+	VBS_Index idx = vbs_nextFreeBlock(virtualBlockStorage);
+	printf("%u is the next open block\n",idx);
 	error = vbs_write(virtualBlockStorage, idx, loader);
 	if(error < 0){
 		perror("error in creating root dir");
