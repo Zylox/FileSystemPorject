@@ -199,7 +199,7 @@ static int splitFileAndDirPath(const char* absoluteFilename, char** dirPath, cha
 	printf("%d\n",filenameSize);
 	*filename = malloc(filenameSize);
 	strncpy(*filename, token, strlen(token));
-	dirPath = malloc(strlen(absoluteFilename) - filenameSize+1);
+	*dirPath = malloc(strlen(absoluteFilename) - filenameSize+1);
 	strncpy(*dirPath, absoluteFilename, strlen(absoluteFilename) - filenameSize+1);
 	char* dirPathEnd = *dirPath + strlen(*dirPath)-1;
 	*dirPathEnd = '\0';
