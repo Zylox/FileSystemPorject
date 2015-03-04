@@ -179,7 +179,7 @@ int fs_mount() {
 	return 0;
 }
 
-static int splitFileAndDirPath(const char* absoluteFilename, char* dirPath, char* filename){
+static int splitFileAndDirPath(const char* absoluteFilename, char** dirPath, char** filename){
 	if(*absoluteFilename != '/'){
 		perror("please start filepath with /");
 		return INVALID_PATH;
@@ -197,12 +197,11 @@ static int splitFileAndDirPath(const char* absoluteFilename, char* dirPath, char
 	}
 	int filenameSize = strlen(token);
 	printf("%d\n",filenameSize);
-	filename = malloc(filenameSize);
-	strncpy(filename, token, strlen(token));
-	// printf("%d",strlen(token));
-	// printf("%d",strlen(filename));
-	dirPath = strncpy(dirPath, absoluteFilename, strlen(absoluteFilename) - filenameSize+1);
-	char* dirPathEnd = dirPath + strlen(dirPath)-1;
+	*filename = malloc(filenameSize);
+	strncpy(*filename, token, strlen(token));
+
+	*dirPath = strncpy(*dirPath, absoluteFilename, strlen(absoluteFilename) - filenameSize+1);
+	char* dirPathEnd = *dirPath + strlen(*dirPath)-1;
 	*dirPathEnd = '\0';
 	
 	
@@ -212,7 +211,8 @@ static int splitFileAndDirPath(const char* absoluteFilename, char* dirPath, char
 int fs_create_file(const char* absoluteFilename,FileType fileType) {
 	int error = -1;
 	char *dirPath, *filename;
-	error = splitFileAndDirPath(absoluteFilename, dirPath, filename);
+	
+	error = splitFileAndDirPath(absoluteFilename, &dirPath, &filename);
 	if(error < 1){
 		return INVALID_PATH;
 	}
