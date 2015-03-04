@@ -81,7 +81,7 @@ int fs_mount() {
 	short error = -1;
 	
 	memcpy(&loader, &rootBlock, sizeof(FS_Block_t));
-	error = vbs_write(virtualBlockStorage, 40, loader);
+	error = vbs_write(virtualBlockStorage, 1, loader);
 	if(error < 0){
 		perror("error in creating root dir");
 		return MOUNT_FAILURE;
