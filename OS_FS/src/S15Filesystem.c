@@ -272,7 +272,7 @@ int fs_get_directory (const char* absolutePath, Directory_t* directoryContents) 
 	char* afnCopy = strdup(absolutePath);
 	char* tokens = strtok(afnCopy, "/");
 	
-	Directory_t dir = get_rootDirectory();
+	Directory_t dir = getRootDirectory();
 	
 	while (tokens) {
 		
