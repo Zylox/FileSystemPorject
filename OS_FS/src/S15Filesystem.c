@@ -197,6 +197,8 @@ static int splitFileAndDirPath(const char* absoluteFilename, char* dirPath, char
 	}
 	int filenameSize = strlen(token);
 	filename = strdup(token);
+	printf("%d",strlen(token));
+	printf("%d",strlen(filename));
 	dirPath = strncpy(dirPath, absoluteFilename, strlen(absoluteFilename) - filenameSize+1);
 	char* dirPathEnd = dirPath + strlen(dirPath)-1;
 	*dirPathEnd = '\0';
