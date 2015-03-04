@@ -36,7 +36,7 @@ static unsigned char firstOpenInodeIdx(){
 	int i;
 	//start at one because the first inode is the root always;
 	for(i=1; i < INODE_NUM; i++){
-		if(inodes[i].metaData.fileLinked == 0){
+		if(inodes[i].metaData.fileLinked == FILE_UNLINKED){
 			return (unsigned char) i;
 		}
 	}
