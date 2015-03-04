@@ -2,7 +2,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
-#include <time.h>;
+#include <time.h>
 #include <VirtualBlockStorage.h>
 
 #include "../include/S15Filesystem.h"
@@ -25,34 +25,34 @@ static VBS_Type *virtualBlockStorage;
 
 static Inode_t inodes[INODE_NUM];
 
-static unsigned char firstOpenInodeIdx(){
+// static unsigned char firstOpenInodeIdx(){
 	
-	int i;
-	//start at one because the first inode is the root always;
-	for(i=1; i < INODE_NUM; i++){
-		if(inodes[i].metadata.fileLinked == 0){
-			return (unsigned char) i;
-		}
-	}
+	// int i;
+	////start at one because the first inode is the root always;
+	// for(i=1; i < INODE_NUM; i++){
+		// if(inodes[i].metaData.fileLinked == 0){
+			// return (unsigned char) i;
+		// }
+	// }
 	
-	return 0;
-}
+	// return 0;
+// }
 
-static char* getDirectorysFromPath(const char* absolutePath){
+// static char* getDirectorysFromPath(const char* absolutePath){
 	
-	char* afnCopy = strdup(absoluteFilename);
-	char* tokens = strtok(afnCopy, "/");
-	char* directoryPath;
+	// char* afnCopy = strdup(absolutePath);
+	// char* tokens = strtok(afnCopy, "/");
+	// char* directoryPath;
 	
-	while (tokens) {
-		tokens = strtok(NULL, " ");
+	// while (tokens) {
+		// tokens = strtok(NULL, " ");
 		
-	}
-}
+	// }
+// }
 
 static unsigned int calculateFileSize(Inode_t file){
 	unsigned int size = 0;
-	
+	return size;
 	
 }
 
@@ -64,7 +64,7 @@ int fs_mount() {
 	BlockType loader;
 	Inode_t rootInode;
 	
-	rootInode.fileName = "root";
+	strncpy(rootInode.fileName, "root");
 	rootInode.metaData.fileType = DIR_FILE;
 	rootInode.metaData.fileSize = sizeof(Directory_t);
 	rootInode.metaData.fileLinked = FILE_LINKED;
