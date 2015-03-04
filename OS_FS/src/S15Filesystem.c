@@ -295,7 +295,7 @@ int fs_get_directory (const char* absolutePath, Directory_t* directoryContents) 
 	
 	
 	while (tokens) {
-		
+		perror("aaaa");
 		if(tokens == NULL){
 			return 1;
 		}
