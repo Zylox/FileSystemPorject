@@ -96,7 +96,7 @@ int fs_mount() {
 	}
 	for(i = 8; i <=39; i+=1){
 		
-		memcpy(&loader, inodes[inodeLoaderOffset], sizeof(BlockType));
+		memcpy(&loader, &inodes[inodeLoaderOffset], sizeof(BlockType));
 		//8 inodes per blocktype;
 		inodeLoaderOffset+=8;
 		
