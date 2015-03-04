@@ -14,6 +14,7 @@
 #define FS_FIRST_BLOCK_IDX 40
 
 #define MOUNT_FAILURE -1
+#define INVALID_PATH -2
 
 /*
  * Gives accesses to the VBS for all functions inside this .c
@@ -64,7 +65,7 @@ int fs_mount() {
 	BlockType loader = vbs_make_block();
 	Inode_t rootInode;
 	
-	strncpy(rootInode.fileName, "root", sizeof("root"));
+	strncpy(rootInode.fileName, "/", sizeof("/"));
 	rootInode.metaData.fileType = DIR_FILE;
 	rootInode.metaData.fileSize = sizeof(Directory_t);
 	rootInode.metaData.fileLinked = FILE_LINKED;
@@ -111,7 +112,7 @@ int fs_mount() {
 }
 
 int fs_create_file(const char* absoluteFilename,FileType fileType) {
-
+	fs_get_directroy(absoluteFilename, NULL);
 	//find first open inode;
 	// unsigned char openIdx = firstOpenInodeIdx();
 	// if(openIdx == 0){
@@ -140,6 +141,21 @@ int fs_create_file(const char* absoluteFilename,FileType fileType) {
 
 
 int fs_get_directory (const char* absolutePath, Directory_t* directoryContents) {
+	
+	if(*absolutePath != '/'){
+		perror("please start filepath with /");
+		return IVNALID_PATH;
+	}
+	
+	char* afnCopy = strdup(absolutePath);
+	char* tokens = strtok(afnCopy, "/");
+	
+	while (tokens) {
+		printf("path line: %s\n", tokens);
+		tokens = strtok(NULL, " ");
+		
+	}
+	
 	
 	return 0;
 
