@@ -78,6 +78,8 @@ int fs_mount() {
 	rootBlock.nextBlockIdx = 0;
 	memcpy(&(rootBlock.dataBuffer), &rootDir, sizeof(Directory_t));
 	
+	short error = -1;
+	
 	memcpy(&loader, &rootBlock, sizeof(FS_Block_t));
 	error = vbs_write(virtualBlockStorage, FS_FIRST_BLOCK_IDX, loader);
 	if(error < 0){
@@ -88,7 +90,7 @@ int fs_mount() {
 	
 	int i;
 	int inodeLoaderOffset=0;
-	short error = -1;
+	error = -1;
 	for(i = 1; i < INODES_NUM; i++){
 		inodes[i].metaData.fileLinked = FILE_UNLINKED;
 	}
