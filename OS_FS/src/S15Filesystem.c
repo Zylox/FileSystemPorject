@@ -180,8 +180,6 @@ int fs_mount() {
 }
 
 static int splitFileAndDirPath(const char* absoluteFilename, char* dirPath, char* filename){
-	int error=-1;
-	
 	if(*absoluteFilename != '/'){
 		perror("please start filepath with /");
 		return INVALID_PATH;
@@ -190,7 +188,6 @@ static int splitFileAndDirPath(const char* absoluteFilename, char* dirPath, char
 	char* afnCopy = strdup(absoluteFilename);
 	char* token = strtok(afnCopy, "/");
 	char* nextToken;
-	Directory_t dir = getRootDirectory();
 	
 	while (nextToken){
 		token = nextToken;
