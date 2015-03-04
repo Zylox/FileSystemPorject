@@ -113,11 +113,11 @@ int fs_mount() {
 int fs_create_file(const char* absoluteFilename,FileType fileType) {
 
 	//find first open inode;
-	unsigned char openIdx = firstOpenInodeIdx();
-	if(openIdx == 0){
-		perror("no open inodes");
-		return -1;
-	}
+	// unsigned char openIdx = firstOpenInodeIdx();
+	// if(openIdx == 0){
+		// perror("no open inodes");
+		// return -1;
+	// }
 	
 	/*typedef struct {
 		char fileName[64];
@@ -125,15 +125,15 @@ int fs_create_file(const char* absoluteFilename,FileType fileType) {
 		unsigned short blockPointers[8];
 	} Inode_t;*/
 	
-	Inode_t newInode;
-	char* afnCopy = strdup(absoluteFilename);
-	char* tokens = strtok(afnCopy, "/");
+	// Inode_t newInode;
+	// char* afnCopy = strdup(absoluteFilename);
+	// char* tokens = strtok(afnCopy, "/");
 	
-	while (token) {
+	// while (token) {
 		
-		token = strtok(NULL, " ");
-	}
-	strncpy(newInode.filename, , 64);
+		// token = strtok(NULL, " ");
+	// }
+	// strncpy(newInode.filename, , 64);
 	
 	return 0;
 }
