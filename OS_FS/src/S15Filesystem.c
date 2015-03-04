@@ -187,17 +187,20 @@ static int splitFileAndDirPath(const char* absoluteFilename, char* dirPath, char
 	
 	char* afnCopy = strdup(absoluteFilename);
 	char* nextToken = strtok(afnCopy, "/");
+	
 	char* token;
 	
 	while (nextToken){
 		token = nextToken;
+		printf("%s\n", nextToken);
 		nextToken = strtok(NULL, "/");
 	}
 	int filenameSize = strlen(token);
+	filename = strdup(token);
 	dirPath = strncpy(dirPath, absoluteFilename, strlen(absoluteFilename) - filenameSize+1);
 	char* dirPathEnd = dirPath + strlen(dirPath)-1;
 	*dirPathEnd = '\0';
-	filename = token;
+	
 	
 	return 1;
 }
