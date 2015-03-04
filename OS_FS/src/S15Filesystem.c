@@ -144,7 +144,7 @@ int fs_get_directory (const char* absolutePath, Directory_t* directoryContents) 
 	
 	if(*absolutePath != '/'){
 		perror("please start filepath with /");
-		return IVNALID_PATH;
+		return INVALID_PATH;
 	}
 	
 	char* afnCopy = strdup(absolutePath);
