@@ -94,7 +94,7 @@ static int getDirectoryFromToken(const char* dirName, Directory_t currentDir, Di
 				FS_Block_t fsBlock;
 				memcpy(&fsBlock,vbsBlock.buffer,sizeof(FS_Block_t));
 
-				memcpy(newDir,fsBlock.dataBuffer[0],sizeof(Directory_t));
+				memcpy(newDir,fsBlock.dataBuffer,sizeof(Directory_t));
 				return 1;
 			}else{
 				perror("dirname is a file not a directory");
