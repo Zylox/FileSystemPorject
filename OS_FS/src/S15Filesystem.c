@@ -150,10 +150,15 @@ int fs_get_directory (const char* absolutePath, Directory_t* directoryContents) 
 	char* afnCopy = strdup(absolutePath);
 	char* tokens = strtok(afnCopy, "/");
 	char* temp;
+	
+	
 	while (tokens) {
 		printf("path line for %s: %s\n", absolutePath,tokens);
 		
 		temp = strtok(NULL, " ");
+		if(temp == NULL){
+			return 1;
+		}
 		tokens = temp;
 	}
 	
