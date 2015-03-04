@@ -158,8 +158,9 @@ int fs_get_directory (const char* absolutePath, Directory_t* directoryContents) 
 		if(temp == NULL){
 			return 1;
 		}
-		tokens = temp;
+		
 		printf("path line for %s: %s\n", absolutePath,tokens);
+		tokens = temp;
 		
 	}
 	
