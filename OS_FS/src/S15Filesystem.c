@@ -316,7 +316,7 @@ int fs_get_directory (const char* absolutePath, Directory_t* directoryContents) 
 	}
 	
 	
-	return 0;
+	return 1;
 
 
 }
