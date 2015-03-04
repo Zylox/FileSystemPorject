@@ -87,7 +87,7 @@ static int getDirectoryFromToken(const char* dirName, Directory_t currentDir, Di
 	int i;
 	for(i = 0; i < 10; i++){
 		if(strcmp(dirName, (*dirEntry).filename)){
-			Inode_t file = inodes[dirEntry.inodeIdx];
+			Inode_t file = inodes[(*dirEntry).inodeIdx];
 			if(file.metaData.fileType == DIR_FILE){
 				BlockType vbsBlock= vbs_make_block();
 				vbsBlock = vbs_read(virtualBlockStorage, file.blockPointers[0]);
