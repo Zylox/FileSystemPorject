@@ -76,7 +76,7 @@ static Directory_t getRootDirectory(){
 	memcpy(&fsBlock,vbsBlock.buffer,sizeof(FS_Block_t));
 	
 	Directory_t dir;
-	memcpy(&dir,fsBlock.dataBuffer[0],sizeof(Directory_t));
+	memcpy(&dir,fsBlock.dataBuffer,sizeof(Directory_t));
 	
 	return dir;
 }
