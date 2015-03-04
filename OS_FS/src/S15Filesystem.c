@@ -186,8 +186,8 @@ static int splitFileAndDirPath(const char* absoluteFilename, char* dirPath, char
 	}
 	
 	char* afnCopy = strdup(absoluteFilename);
-	char* token = strtok(afnCopy, "/");
-	char* nextToken;
+	char* nextToken = strtok(afnCopy, "/");
+	char* token;
 	
 	while (nextToken){
 		token = nextToken;
@@ -209,6 +209,7 @@ int fs_create_file(const char* absoluteFilename,FileType fileType) {
 	if(error < 1){
 		return INVALID_PATH;
 	}
+	printf("%d\n",);
 	
 	if(strlen(filename) > MAX_FILENAME_LEN){
 		perror("filename too long");
