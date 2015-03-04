@@ -88,7 +88,6 @@ int fs_mount() {
 		return MOUNT_FAILURE;
 	}
 	
-	
 	int i;
 	int inodeLoaderOffset=0;
 	error = -1;
