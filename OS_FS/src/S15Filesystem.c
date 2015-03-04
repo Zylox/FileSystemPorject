@@ -91,7 +91,7 @@ int fs_mount() {
 	int i;
 	int inodeLoaderOffset=0;
 	error = -1;
-	for(i = 1; i < INODES_NUM; i++){
+	for(i = 1; i < INODE_NUM; i++){
 		inodes[i].metaData.fileLinked = FILE_UNLINKED;
 	}
 	for(i = 8; i <=39; i+=1){

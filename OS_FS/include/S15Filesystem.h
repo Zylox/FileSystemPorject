@@ -20,7 +20,7 @@ typedef struct {
 //needs to be 48 bytes
 typedef struct {
 	FileType fileType; //1
-	unsigned int filesize; //4
+	unsigned int fileSize; //4
 	char fileLinked; //1
 	//time_t timeCreated; //4 maybe
 	//time_t timeModified; //4 maybe
