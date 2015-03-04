@@ -229,7 +229,7 @@ int fs_create_file(const char* absoluteFilename,FileType fileType) {
 	}
 	
 	Inode_t file;
-	strncpy(file.filename, filename, strlen(filename));
+	strncpy(file.fileName, filename, strlen(filename));
 	file.metaData.fileType = fileType;
 	file.metaData.fileSize = 0;
 	file.metaData.fileLinked = FILE_LINKED;
