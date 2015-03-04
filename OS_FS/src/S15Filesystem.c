@@ -190,7 +190,7 @@ static int splitFileAndDirPath(const char* absoluteFilename, char* dirPath, char
 	char* afnCopy = strdup(absoluteFilename);
 	char* token = strtok(afnCopy, "/");
 	char* nextToken;
-	Directory_t dir = get_rootDirectory();
+	Directory_t dir = getRootDirectory();
 	
 	while (nextToken){
 		token = nextToken;
