@@ -104,7 +104,7 @@ static int getDirectoryFromToken(const char* dirName, Directory_t currentDir, Di
 		dirEntry++;
 	}
 	
-	return DIRECTORY_NOT_FOUND
+	return DIRECTORY_NOT_FOUND;
 }
 
 // static char* getDirectorysFromPath(const char* absolutePath){
