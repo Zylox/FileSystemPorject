@@ -429,7 +429,7 @@ int fs_remove_file(const char* absoluteFilename) {
 
 int fs_write_file(const char* absoluteFilename, void* dataToBeWritten, unsigned int numberOfBytes) {
 	char *dirPath, *filename;
-	
+	int error = -1;
 	error = splitFileAndDirPath(absoluteFilename, &dirPath, &filename);
 	if(error < 1){
 		return INVALID_PATH;
