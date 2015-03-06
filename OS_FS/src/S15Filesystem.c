@@ -123,15 +123,13 @@ static unsigned char firstOpenInodeIdx(){
 
 static int writeInodeTable(){
 	int i, j;
-	int inodeLoaderOffset=0;
 	int error = -1;
 	
 	BlockType loader = vbs_make_block();
-	unsigned char* loadWalk = loader.buffer;
 	
 	for(i = 8; i <=39;i++){
 		for(j=0;j<8;j++){
-			memcpy(loadWalk + (j * INODE_T_SIZE), packInode(&inodes[i+j]), INODE_T_SIZE);
+			memcpy(loader.buffer + (j * INODE_T_SIZE), packInode(&inodes[i+j]), INODE_T_SIZE);
 		}
 		error = vbs_write(virtualBlockStorage, i, loader);
 		if(error < 0){
