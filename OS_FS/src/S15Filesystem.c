@@ -163,7 +163,9 @@ static int getDirectoryFromToken(const char* dirName, Directory_t currentDir, Di
 				BlockType vbsBlock= vbs_make_block();
 				vbsBlock = vbs_read(virtualBlockStorage, file.blockPointers[0]);
 				FS_Block_t fsBlock = unpackFSBlock(vbsBlock.buffer);
-				newDir = &(unpackDirectory(fsBlock.dataBuffer));
+				Directory_t tDir = unpackDirectory(fsBlock.dataBuffer);
+				newDir = &tDir;
+				
 				return 1;
 			}else{
 				perror("dirname is a file not a directory");
