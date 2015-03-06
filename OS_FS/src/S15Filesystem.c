@@ -78,11 +78,6 @@ static int removeDirectoryEntry(Directory_t* dir, int index){
 	return 1;
 }
 
-/////The various pack and unpack functions are for transfering things to byte form to be written to the vbs
-////i didnt realize this was needed until the last day and is why i made so little progress after so many hours.
-//stupid mistake on my part.
-
-
 static char* packDirectoryEntrys(DirectoryEntry_t* dirE){
 	char* buffer = malloc(DIR_E_T_SIZE *10);
 	int i;
@@ -414,7 +409,7 @@ int fs_get_directory (const char* absolutePath, Directory_t* directoryContents) 
 }
 
 int fs_seek_within_file (const char* absoluteFilename, unsigned int offset, unsigned int orgin) {
-	///ran out of time
+	//ran out of time
 	return 0;
 }
 
