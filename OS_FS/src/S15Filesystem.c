@@ -344,7 +344,10 @@ int fs_create_file(const char* absoluteFilename,FileType fileType) {
 	}
 
 	
-	addDirectoryEntry(&dir, filename, inodeIdx);
+	error = addDirectoryEntry(&dir, filename, inodeIdx);
+	if(error < 1){
+		return error;
+	}
 	
 	inodes[inodeIdx] = file;
 	
