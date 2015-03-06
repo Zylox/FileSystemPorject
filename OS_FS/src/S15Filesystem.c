@@ -220,7 +220,7 @@ int fs_mount() {
 	
 	short error = -1;
 	
-	memcpy(loader.buffer, packFSBlock(rootBlock), FS_BLOCK_T_SIZE);
+	memcpy(loader.buffer, packFSBlock(&rootBlock), FS_BLOCK_T_SIZE);
 	
 	error = vbs_write(virtualBlockStorage, FS_FIRST_BLOCK_IDX, loader);
 	if(error < 0){
