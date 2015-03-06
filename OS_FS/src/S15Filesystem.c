@@ -240,7 +240,7 @@ int fs_mount() {
 	
 	Directory_t rootDir;
 	initDir(&rootDir);
-	error = addDirectoryEntry(rootDir, rootInode.fileName, 0);
+	error = addDirectoryEntry(&rootDir, rootInode.fileName, 0);
 	if(error < 1){
 		perror("Initilizing the directory fialed");
 		return MOUNT_FAILURE;
