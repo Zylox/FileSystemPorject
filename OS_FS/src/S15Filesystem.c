@@ -481,7 +481,7 @@ int fs_remove_file(const char* absoluteFilename) {
 			if(error < 1){
 				return error;
 			}
-			error = removeDirectoryEntry(dir, i);
+			error = removeDirectoryEntry(&dir, i);
 			if(error < 1){
 				return error;
 			}
