@@ -479,44 +479,44 @@ int fs_remove_file(const char* absoluteFilename) {
 
 
 int fs_write_file(const char* absoluteFilename, void* dataToBeWritten, unsigned int numberOfBytes) {
-	char *dirPath, *filename;
-	int error = -1;
-	error = splitFileAndDirPath(absoluteFilename, &dirPath, &filename);
-	if(error < 1){
-		return INVALID_PATH;
-	}
+	// char *dirPath, *filename;
+	// int error = -1;
+	// error = splitFileAndDirPath(absoluteFilename, &dirPath, &filename);
+	// if(error < 1){
+		// return INVALID_PATH;
+	// }
 	
-	Directory_t dir;
-	error = fs_get_directory(dirPath, &dir);
-	if(error < 1){
-		return DIRECTORY_NOT_FOUND;
-	}
+	// Directory_t dir;
+	// error = fs_get_directory(dirPath, &dir);
+	// if(error < 1){
+		// return DIRECTORY_NOT_FOUND;
+	// }
 	
-	DirectoryEntry_t* dirEntry;
-	dirEntry = dir.entries;
-	int i;
-	for(i = 0; i < 10; i++){
-		if(strcmp(filename, (*dirEntry).filename)){
-			Inode_t inode = inodes[(*dirEntry).inodeIdx];
-			FS_Block_t fsBlock;
-			BlockType vbsBlock= vbs_make_block();	
-			unsigned int bytesWritten=0;
-			unsigned short nextOpenFSB;
-			nextOpenFSB = vbs_nextFreeBlock(virtualBlockStorage);
-			fsBlock.nextBlockIdx = nextOpenFSB;
-			for(;;){
+	// DirectoryEntry_t* dirEntry;
+	// dirEntry = dir.entries;
+	// int i;
+	// for(i = 0; i < 10; i++){
+		// if(strcmp(filename, (*dirEntry).filename)){
+			// Inode_t inode = inodes[(*dirEntry).inodeIdx];
+			// FS_Block_t fsBlock;
+			// BlockType vbsBlock= vbs_make_block();	
+			// unsigned int bytesWritten=0;
+			// unsigned short nextOpenFSB;
+			// nextOpenFSB = vbs_nextFreeBlock(virtualBlockStorage);
+			// fsBlock.nextBlockIdx = nextOpenFSB;
+			// for(;;){
 				
-				memcpy(fsBlock.dataBuffer, dataToBeWritten + bytesWritten,sizeof(char)*1020);
-				bytesWritten += 1020;
-				fsBlock.validBytes=1020;
-				memcpy(vbsBlock.buffer, packFSBlock(&fsBlock), FS_BLOCK_T_SIZE);
-				///crap, i need another open one inddex and it wont return a new one till i write to this on.......
-				///im out of time unfortuantley....
-			}
+				// memcpy(fsBlock.dataBuffer, dataToBeWritten + bytesWritten,sizeof(char)*1020);
+				// bytesWritten += 1020;
+				// fsBlock.validBytes=1020;
+				// memcpy(vbsBlock.buffer, packFSBlock(&fsBlock), FS_BLOCK_T_SIZE);
+				////crap, i need another open one inddex and it wont return a new one till i write to this on.......
+				////im out of time unfortuantley....
+			// }
 			
-		}
-		dirEntry++;
-	}
+		// }
+		// dirEntry++;
+	// }
 	
 	
 	
