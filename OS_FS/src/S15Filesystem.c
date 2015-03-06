@@ -13,6 +13,11 @@
 
 #define FS_FIRST_BLOCK_IDX 40
 
+#define DIR_E_T_SIZE (sizeof(char)*64 + sizeof(unsigned char))
+#define DIR_T_SIZE  ((sizeof(char)*64 + sizeof(unsigned char)) * 10 + sizeof(size_t))
+#define INODE_T_SIZE (sizeof(char)*64 + sizeof(FileMetadata_t) + sizeof(unsigned short) * 8)
+#define FS_BLOCK_T_SIZE (sizeof(unsigned short) + sizeof(char) * 1020 + sizeof(unsigned short))
+
 #define NO_OPEN_INODE 0
 #define MOUNT_FAILURE -1
 #define INVALID_PATH -2
@@ -31,6 +36,77 @@ static VBS_Type *virtualBlockStorage;
 
 static Inode_t inodes[INODE_NUM];
 
+static char* packDirectoryEntrys(DirectoryEntry_t* dirE){
+	char* buffer = malloc(DIR_E_T_SIZE *10);
+	int i;
+	for(i=0;i<10,i++){
+		memcpy(buffer + (i*sizeof(DIR_E_T_SIZE)), dirE->filename, sizeof(char)*64);
+		memcpy(buffer + (i*sizeof(DIR_E_T_SIZE)) + sizeof(char)*64, &(dirE->inodeIdx), sizeof(unsigned char));
+		dirE++;
+	}
+	
+	return buffer;
+}
+
+static DirectoryEntry_t* unpackDirectoryEntrys(char* dataBuffer){
+	DirectoryEntry_t* entries;
+	DirectoryEntry_t* walker = entries;
+	int i;
+	for(i=0;i<10,i++){
+		memcpy(walker->filename, dataBuffer + (i*sizeof(DIR_E_T_SIZE)), sizeof(char)*64);
+		memcpy(&(walker->inodeIdx) ,dataBuffer + (i*sizeof(DIR_E_T_SIZE)) + sizeof(char)*64, sizeof(unsigned char));
+		walker++;
+	}
+	
+	return entries;
+}
+
+static char* packDirectory(Directory_t* dir){
+	char* buffer = malloc(DIR_T_SIZE);
+	memcpy(buffer, packDirectoryEntrys(dir->entries), sizeof(DIR_E_T_SIZE) * 10);
+	memcpy(buffer + sizeof(DIR_E_T_SIZE) * 10, dir->size, sizeof(size_t));
+	return buffer;
+}
+
+static Directory_t unpackDirectory(char* dataBuffer){
+	Directory_t dir;
+	dir.entries = unpackDirectoryEntrys(dataBuffer);
+	memcpy(&(dir.size), dataBuffer + sizeof(DIR_E_T_SIZE) * 10, sizeof(size_t));
+	return dir;
+}
+
+static char* packInode(Inode* inode){
+	char* buffer = malloc(INODE_T_SIZE);
+	memcpy(buffer, inode->fileName, sizeof(char) * 64);
+	memcpy(buffer + sizeof(char) * 64, inode->metadata, sizeof(FileMetadata_t));
+	memcpy(buffer + sizeof(char) * 64 + sizeof(FileMetadata_t), inode->blockPointers, sizeof(unsigned short) * 8);
+	return buffer;
+}
+
+static Inode unpackInode(char* dataBuffer){
+	Inode inode;
+	memcpy(inode.fileName, dataBuffer, sizeof(char) * 64);
+	memcpy(&(inode.metaData), dataBuffer + sizeof(char) * 64, sizeof(FileMetadata_t));
+	memcpy(inode.blockPointers, dataBuffer + sizeof(char) * 64 + sizeof(FileMetadata_t), sizeof(unsigned short) * 8);
+	return inode;
+}
+
+static char* packFSBlock(FS_Block_t* fsBlock){
+	char* buffer = malloc(FS_BLOCK_T_SIZE);
+	memcpy(buffer, &(fsBlock->validBytes), sizeof(unsigned short));
+	memcpy(buffer + sizeof(unsigned short), fsBlock->dataBuffer, sizeof(char) * 1020);
+	memcpy(buffer + sizeof(unsigned short) + sizeof(char) * 1020, &(fsBlock->nextBlockIdx), sizeof(unsigned short));
+	return buffer;
+}
+
+static FS_Block_t unpackFSBlock(unsigned char* dataBuffer){
+	FS_Block_t fsBlock;
+	memcpy(&(fsBlock.validBytes), dataBuffer, sizeof(unsigned short));
+	memcpy(fsBlock.dataBuffer, dataBuffer + sizeof(unsigned short), sizeof(char) * 1020);
+	memcpy(&(fsBlock.nextBlockIdx), dataBuffer + sizeof(unsigned short) + sizeof(char) * 1020, sizeof(unsigned short));
+	return fsBlock;
+}
+
 static unsigned char firstOpenInodeIdx(){
 	
 	int i;
@@ -46,18 +122,16 @@ static unsigned char firstOpenInodeIdx(){
 }
 
 static int writeInodeTable(){
-	int i;
+	int i, j;
 	int inodeLoaderOffset=0;
 	int error = -1;
 	
 	BlockType loader = vbs_make_block();
 	
-	for(i = 8; i <=39; i+=1){
-		
-		memcpy(loader.buffer, &inodes[inodeLoaderOffset], sizeof(BlockType));
-		//8 inodes per blocktype;
-		inodeLoaderOffset+=8;
-		
+	for(i = 8; i <=39;i++){
+		for(j=0;j<8;j++){
+			memcpy(loader.buffer + j * INODE_T_SIZE, packInode(inodes[i+j]), INODE_T_SIZE);
+		}
 		error = vbs_write(virtualBlockStorage, i, loader);
 		if(error < 0){
 			perror("error in the vbs write of inode table");
@@ -72,11 +146,9 @@ static Directory_t getRootDirectory(){
 	Inode_t workingFile = inodes[0];
 	BlockType vbsBlock= vbs_make_block();
 	vbsBlock = vbs_read(virtualBlockStorage, workingFile.blockPointers[0]);
-	FS_Block_t fsBlock;
-	memcpy(&fsBlock,vbsBlock.buffer,sizeof(FS_Block_t));
+	FS_Block_t fsBlock = unpackFSBlock(vbsBlock.buffer);
 	
-	Directory_t dir;
-	memcpy(&dir,fsBlock.dataBuffer,sizeof(Directory_t));
+	Directory_t dir = unpackDirectory(fsBlock.dataBuffer);
 	
 	return dir;
 }
@@ -91,10 +163,8 @@ static int getDirectoryFromToken(const char* dirName, Directory_t currentDir, Di
 			if(file.metaData.fileType == DIR_FILE){
 				BlockType vbsBlock= vbs_make_block();
 				vbsBlock = vbs_read(virtualBlockStorage, file.blockPointers[0]);
-				FS_Block_t fsBlock;
-				memcpy(&fsBlock,vbsBlock.buffer,sizeof(FS_Block_t));
-
-				memcpy(newDir,fsBlock.dataBuffer,sizeof(Directory_t));
+				FS_Block_t fsBlock = unpackFSBlock(vbsBlock.buffer);
+				newDir = &(unpackDirectory(fsBlock.dataBuffer));
 				return 1;
 			}else{
 				perror("dirname is a file not a directory");
@@ -135,7 +205,7 @@ int fs_mount() {
 	
 	strncpy(rootInode.fileName, "/", sizeof("/"));
 	rootInode.metaData.fileType = DIR_FILE;
-	rootInode.metaData.fileSize = sizeof(Directory_t);
+	rootInode.metaData.fileSize = DIR_T_SIZE;
 	rootInode.metaData.fileLinked = FILE_LINKED;
 	rootInode.blockPointers[0] = FS_FIRST_BLOCK_IDX;
 	inodes[0] = rootInode;
@@ -143,13 +213,13 @@ int fs_mount() {
 	Directory_t rootDir;
 	rootDir.size = sizeof(DirectoryEntry_t);
 	FS_Block_t rootBlock;
-	rootBlock.validBytes = sizeof(Directory_t);
+	rootBlock.validBytes = DIR_T_SIZE;
 	rootBlock.nextBlockIdx = 0;
-	memcpy(&(rootBlock.dataBuffer), &rootDir, sizeof(Directory_t));
+	memcpy(&(rootBlock.dataBuffer), packDirectory(rootDir), DIR_T_SIZE);
 	
 	short error = -1;
 	
-	memcpy(loader.buffer, &rootBlock, sizeof(FS_Block_t));
+	memcpy(loader.buffer, packFSBlock(rootBlock), FS_BLOCK_T_SIZE);
 	
 	error = vbs_write(virtualBlockStorage, FS_FIRST_BLOCK_IDX, loader);
 	if(error < 0){
@@ -163,19 +233,9 @@ int fs_mount() {
 	for(i = 1; i < INODE_NUM; i++){
 		inodes[i].metaData.fileLinked = FILE_UNLINKED;
 	}
-	for(i = 8; i <=39; i+=1){
-		
-		memcpy(loader.buffer, &inodes[inodeLoaderOffset], sizeof(BlockType));
-		//8 inodes per blocktype;
-		inodeLoaderOffset+=8;
-		
-		error = vbs_write(virtualBlockStorage, i, loader);
-		if(error < 0){
-			perror("error in the vbs write");
-			return MOUNT_FAILURE;
-		}
-	}
 
+	writeInodeTable();
+	
 	return 0;
 }
 
