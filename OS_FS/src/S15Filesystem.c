@@ -238,7 +238,8 @@ int fs_mount() {
 
 	short error = -1;
 	
-	Directory_t rootDir = initDir(&rootDir);
+	Directory_t rootDir;
+	rootDir= initDir(&rootDir);
 	error = addDirectoryEntry(rootDir, rootInode.fileName, 0);
 	if(error < 1){
 		perror("Initilizing the directory fialed");
