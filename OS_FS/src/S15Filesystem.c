@@ -83,7 +83,7 @@ static char* packInode(Inode_t* inode){
 	return buffer;
 }
 
-static Inode unpackInode(char* dataBuffer){
+static Inode_t unpackInode(char* dataBuffer){
 	Inode_t inode;
 	memcpy(inode.fileName, dataBuffer, sizeof(char) * 64);
 	memcpy(&(inode.metaData), dataBuffer + sizeof(char) * 64, sizeof(FileMetadata_t));
