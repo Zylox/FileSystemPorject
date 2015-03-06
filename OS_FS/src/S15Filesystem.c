@@ -55,7 +55,7 @@ static int addDirectoryEntry(Directory_t* dir, const char* filename, unsigned ch
 	memcpy(dirE.filename, filename, sizeof(char)*MAX_FILENAME_LEN+1);
 	dirE.inodeIdx = inodeIdx;
 	
-	memcpy(dir->entries + size, &dirE, DIR_E_T_SIZE);
+	memcpy(dir->entries + dir->size, &dirE, DIR_E_T_SIZE);
 	dir->size += DIR_E_T_SIZE;
 	
 	return 1;
