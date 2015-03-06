@@ -40,8 +40,8 @@ static char* packDirectoryEntrys(DirectoryEntry_t* dirE){
 	char* buffer = malloc(DIR_E_T_SIZE *10);
 	int i;
 	for(i=0;i<10;i++){
-		memcpy(buffer + (i*sizeof(DIR_E_T_SIZE)), dirE->filename, sizeof(char)*64);
-		memcpy(buffer + (i*sizeof(DIR_E_T_SIZE)) + sizeof(char)*64, &(dirE->inodeIdx), sizeof(unsigned char));
+		memcpy(buffer + (i*DIR_E_T_SIZE), dirE->filename, sizeof(char)*64);
+		memcpy(buffer + (i*DIR_E_T_SIZE) + sizeof(char)*64, &(dirE->inodeIdx), sizeof(unsigned char));
 		dirE++;
 	}
 	
@@ -53,8 +53,8 @@ static DirectoryEntry_t* unpackDirectoryEntrys(char* dataBuffer){
 	DirectoryEntry_t* walker = entries;
 	int i;
 	for(i=0;i<10;i++){
-		memcpy(walker->filename, dataBuffer + (i*sizeof(DIR_E_T_SIZE)), sizeof(char)*64);
-		memcpy(&(walker->inodeIdx) ,dataBuffer + (i*sizeof(DIR_E_T_SIZE)) + sizeof(char)*64, sizeof(unsigned char));
+		memcpy(walker->filename, dataBuffer + (i*DIR_E_T_SIZE), sizeof(char)*64);
+		memcpy(&(walker->inodeIdx) ,dataBuffer + (i*DIR_E_T_SIZE) + sizeof(char)*64, sizeof(unsigned char));
 		walker++;
 	}
 	
@@ -63,15 +63,15 @@ static DirectoryEntry_t* unpackDirectoryEntrys(char* dataBuffer){
 
 static char* packDirectory(Directory_t* dir){
 	char* buffer = malloc(DIR_T_SIZE);
-	memcpy(buffer, packDirectoryEntrys(dir->entries), sizeof(DIR_E_T_SIZE) * 10);
-	memcpy(buffer + sizeof(DIR_E_T_SIZE) * 10, &(dir->size), sizeof(size_t));
+	memcpy(buffer, packDirectoryEntrys(dir->entries), DIR_E_T_SIZE * 10);
+	memcpy(buffer + DIR_E_T_SIZE * 10, &(dir->size), sizeof(size_t));
 	return buffer;
 }
 
 static Directory_t unpackDirectory(char* dataBuffer){
 	Directory_t dir;
 	dir.entries = unpackDirectoryEntrys(dataBuffer);
-	memcpy(&(dir.size), dataBuffer + sizeof(DIR_E_T_SIZE) * 10, sizeof(size_t));
+	memcpy(&(dir.size), dataBuffer + DIR_E_T_SIZE * 10, sizeof(size_t));
 	return dir;
 }
 
