@@ -78,6 +78,11 @@ static int removeDirectoryEntry(Directory_t* dir, int index){
 	return 1;
 }
 
+/////The various pack and unpack functions are for transfering things to byte form to be written to the vbs
+////i didnt realize this was needed until the last day and is why i made so little progress after so many hours.
+//stupid mistake on my part.
+
+
 static char* packDirectoryEntrys(DirectoryEntry_t* dirE){
 	char* buffer = malloc(DIR_E_T_SIZE *10);
 	int i;
@@ -220,23 +225,6 @@ static int getDirectoryFromToken(const char* dirName, Directory_t currentDir, Di
 	return DIRECTORY_NOT_FOUND;
 }
 
-// static char* getDirectorysFromPath(const char* absolutePath){
-	
-	// char* afnCopy = strdup(absolutePath);
-	// char* tokens = strtok(afnCopy, "/");
-	// char* directoryPath;
-	
-	// while (tokens) {
-		// tokens = strtok(NULL, " ");
-		
-	// }
-// }
-
-// static unsigned int calculateFileSize(Inode_t file){
-	// unsigned int size = 0;
-	// return size;
-	
-// }
 
 int fs_mount() {
 	
@@ -426,7 +414,7 @@ int fs_get_directory (const char* absolutePath, Directory_t* directoryContents) 
 }
 
 int fs_seek_within_file (const char* absoluteFilename, unsigned int offset, unsigned int orgin) {
-	
+	///ran out of time
 	return 0;
 }
 
@@ -494,6 +482,7 @@ int fs_remove_file(const char* absoluteFilename) {
 	return 1;
 }
 
+
 int fs_write_file(const char* absoluteFilename, void* dataToBeWritten, unsigned int numberOfBytes) {
 	char *dirPath, *filename;
 	int error = -1;
@@ -508,6 +497,31 @@ int fs_write_file(const char* absoluteFilename, void* dataToBeWritten, unsigned 
 		return DIRECTORY_NOT_FOUND;
 	}
 	
+	DirectoryEntry_t* dirEntry;
+	dirEntry = dir.entries;
+	int i;
+	for(i = 0; i < 10; i++){
+		if(strcmp(filename, (*dirEntry).filename)){
+			Inode_t inode = inodes[(*dirEntry).inodeIdx];
+			FS_Block_t fsBlock;
+			BlockType vbsBlock= vbs_make_block();	
+			unsigned int bytesWritten=0;
+			unsigned short nextOpenFSB;
+			nextOpenFSB = vbs_nextFreeBlock(virtualBlockStorage);
+			fsBlock.nextBlockIdx = nextOpenFSB;
+			for(;;){
+				
+				memcpy(fsBlock.dataBuffer, dataToBeWritten + bytesWritten,sizeof(char)*1020);
+				bytesWritten += 1020;
+				fsBlock.validBytes=1020;
+				memcpy(vbsBlock.buffer, packFSBlock(&fsBlock), FS_BLOCK_T_SIZE);
+				///crap, i need another open one inddex and it wont return a new one till i write to this on.......
+				///im out of time unfortuantley....
+			}
+			
+		}
+		dirEntry++;
+	}
 	
 	
 	
@@ -515,6 +529,7 @@ int fs_write_file(const char* absoluteFilename, void* dataToBeWritten, unsigned 
 }
 
 int fs_read_file(const char* absoluteFilename, void* dataToBeRead, unsigned int numberOfBytes) {
+	//ran out of time
 	return 0;
 }
 
