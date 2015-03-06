@@ -308,20 +308,20 @@ int fs_create_file(const char* absoluteFilename,FileType fileType) {
 	if(error < 1){
 		return INVALID_PATH;
 	}
-	printf("7\n");
+
 	
 	
 	if(strlen(filename) > MAX_FILENAME_LEN){
 		perror("filename too long");
 		return INVALID_PATH;
 	}
-	printf("6\n");
+
 	
 	
 	Directory_t dir;
 	error = fs_get_directory(dirPath, &dir);
 	if(error < 1){
-		printf("5\n");
+
 		return DIRECTORY_NOT_FOUND;
 	}
 
@@ -331,7 +331,7 @@ int fs_create_file(const char* absoluteFilename,FileType fileType) {
 		perror("Directory is full, no more files can be added");
 		return DIRECTORY_FULL;
 	}
-	printf("4\n");
+
 	
 	Inode_t file;
 	strncpy(file.fileName, filename, strlen(filename));
@@ -343,7 +343,7 @@ int fs_create_file(const char* absoluteFilename,FileType fileType) {
 	if(inodeIdx == NO_OPEN_INODE){
 		return FILE_CREATION_FAILURE;
 	}
-	printf("3\n");
+
 	
 	DirectoryEntry_t dirEntry;
 	strncpy(dirEntry.filename, filename, strlen(filename));
@@ -359,12 +359,11 @@ int fs_create_file(const char* absoluteFilename,FileType fileType) {
 		perror("inodewritefailedsomehow");
 		return error;
 	}
-	printf("2\n");
+
 	
 	free(dirPath);
 	free(filename);
-	
-	printf("1\n");
+
 	return 0;
 }
 
