@@ -25,6 +25,7 @@
 #define INCORRECT_FILE_TYPE -4
 #define DIRECTORY_FULL -5
 #define FILE_CREATION_FAILURE -6
+#define FILE_ACCESS_FAILURE -7
 
 /*
  * Gives accesses to the VBS for all functions inside this .c
@@ -57,6 +58,22 @@ static int addDirectoryEntry(Directory_t* dir, const char* filename, unsigned ch
 	
 	memcpy(dir->entries + dir->size, &dirE, DIR_E_T_SIZE);
 	dir->size += DIR_E_T_SIZE;
+	
+	return 1;
+}
+
+static int removeDirectoryEntry(Directory_t* dir, int index){
+	if(index > 9){
+		perror("directory index out of scope");
+		return -1
+	}
+	
+	DirectoryEntry_t dirE = dir->entries;
+	dirE += index;
+	dir->size -= DIR_E_T_SIZE;
+	if(index < 9){
+		memcpy(dirE, dirE+1, DIR_E_T_SIZE * (9-index));
+	}
 	
 	return 1;
 }
@@ -325,7 +342,7 @@ int fs_create_file(const char* absoluteFilename,FileType fileType) {
 	}
 
 	
-	int lastDirEntryIdx = dir.size/sizeof(DirectoryEntry_t);
+	int lastDirEntryIdx = dir.size/DIR_E_T_SIZE;
 	if(lastDirEntryIdx > 10){
 		perror("Directory is full, no more files can be added");
 		return DIRECTORY_FULL;
@@ -413,6 +430,26 @@ int fs_seek_within_file (const char* absoluteFilename, unsigned int offset, unsi
 	return 0;
 }
 
+static int eraseFile(Inode_t inode){
+	BlockType vbsBlock= vbs_make_block();	
+	FS_Block_t fsBlock;
+	unsigned short nextBID = inode.blockPointers[0];
+	bool erased;
+	
+	do{
+		vbsBlock = vbs_read(virtualBlockStorage, nextBID);	
+		fsBlock = unpackFSBlock(vbsBlock.buffer);
+		erased = vbs_erase(virtualBlockStorage, nextBID);
+		if(erased == false){
+			perror("failure erasing file");
+			return FILE_ACCESS_FAILURE;
+		}
+		nextBID = fsBlock.nextBlockIdx;
+	}while(nextBID != 0);
+	
+	return 1;
+}
+
 int fs_remove_file(const char* absoluteFilename) {
 	char *dirPath, *filename;
 	int error = -1;
@@ -426,8 +463,35 @@ int fs_remove_file(const char* absoluteFilename) {
 	if(error < 1){
 		return DIRECTORY_NOT_FOUND;
 	}
-	return 0;
-
+	
+	if(dir.size != 0){
+		//design decision
+		perror("cannot delete directory with items");
+		return INVALID_PATH;
+	}
+	
+	DirectoryEntry_t* dirEntry;
+	dirEntry = dir.entries;
+	int i;
+	for(i = 0; i < 10; i++){
+		if(strcmp(filename, (*dirEntry).filename)){
+			Inode_t inode = inodes[(*dirEntry).filename];
+			inode.metaData.fileLinked = FILE_UNLINKED;
+			error = eraseFile(inode);
+			if(error < 1){
+				return error;
+			}
+			error = removeDirectoryEntry(dir, i);
+			if(error < 1){
+				return error;
+			}
+			return 1;
+		}
+		dirEntry++;
+	}
+	
+	printf("file does not exist\n");
+	return 1;
 }
 
 int fs_write_file(const char* absoluteFilename, void* dataToBeWritten, unsigned int numberOfBytes) {
