@@ -1,0 +1,14 @@
+Included both the vbs and the file systems folders
+I dont think i changed anything in the vbs but its just for safety.
+
+I did not finish on time, but a lot of stuff is working. I think.
+Mount, Create, and destroy files should all be working.
+I ran out of time working on write, and read or seek was not finished;
+
+There are two unused variable warnings from -Wall but it was just because i didnt get to use them yet.
+
+The thing that caught me up was a stupid serialization mistake. I was serializing the pointers.
+It took me till the last day to realize it and then i had to retrofit everything after days of banging my head into the wall.
+
+
+Zachary Higginbotham
