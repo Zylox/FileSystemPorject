@@ -344,12 +344,7 @@ int fs_create_file(const char* absoluteFilename,FileType fileType) {
 	}
 
 	
-	DirectoryEntry_t dirEntry;
-	strncpy(dirEntry.filename, filename, strlen(filename));
-	dirEntry.inodeIdx = inodeIdx;
-	DirectoryEntry_t* insertionPoint = dir.entries+(lastDirEntryIdx);
-	*insertionPoint = dirEntry;
-	dir.size += sizeof(DirectoryEntry_t);
+	addDirectoryEntry(&dir, filename, inodeIdx);
 	
 	inodes[inodeIdx] = file;
 	
@@ -416,12 +411,39 @@ int fs_seek_within_file (const char* absoluteFilename, unsigned int offset, unsi
 }
 
 int fs_remove_file(const char* absoluteFilename) {
-
+	char *dirPath, *filename;
+	
+	error = splitFileAndDirPath(absoluteFilename, &dirPath, &filename);
+	if(error < 1){
+		return INVALID_PATH;
+	}
+	
+	Directory_t dir;
+	error = fs_get_directory(dirPath, &dir);
+	if(error < 1){
+		return DIRECTORY_NOT_FOUND;
+	}
 	return 0;
 
 }
 
 int fs_write_file(const char* absoluteFilename, void* dataToBeWritten, unsigned int numberOfBytes) {
+	char *dirPath, *filename;
+	
+	error = splitFileAndDirPath(absoluteFilename, &dirPath, &filename);
+	if(error < 1){
+		return INVALID_PATH;
+	}
+	
+	Directory_t dir;
+	error = fs_get_directory(dirPath, &dir);
+	if(error < 1){
+		return DIRECTORY_NOT_FOUND;
+	}
+	
+	
+	
+	
 	return 0;
 }
 
