@@ -216,7 +216,7 @@ int fs_mount() {
 	FS_Block_t rootBlock;
 	rootBlock.validBytes = DIR_T_SIZE;
 	rootBlock.nextBlockIdx = 0;
-	memcpy(&(rootBlock.dataBuffer), packDirectory(rootDir), DIR_T_SIZE);
+	memcpy(&(rootBlock.dataBuffer), packDirectory(&rootDir), DIR_T_SIZE);
 	
 	short error = -1;
 	
