@@ -65,10 +65,10 @@ static int addDirectoryEntry(Directory_t* dir, const char* filename, unsigned ch
 static int removeDirectoryEntry(Directory_t* dir, int index){
 	if(index > 9){
 		perror("directory index out of scope");
-		return -1
+		return -1;
 	}
 	
-	DirectoryEntry_t dirE = dir->entries;
+	DirectoryEntry_t* dirE = dir->entries;
 	dirE += index;
 	dir->size -= DIR_E_T_SIZE;
 	if(index < 9){
