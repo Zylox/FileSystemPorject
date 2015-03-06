@@ -78,7 +78,7 @@ static Directory_t unpackDirectory(char* dataBuffer){
 static char* packInode(Inode_t* inode){
 	char* buffer = malloc(INODE_T_SIZE);
 	memcpy(buffer, inode->fileName, sizeof(char) * 64);
-	memcpy(buffer + sizeof(char) * 64, inode->metadata, sizeof(FileMetadata_t));
+	memcpy(buffer + sizeof(char) * 64, inode->metaData, sizeof(FileMetadata_t));
 	memcpy(buffer + sizeof(char) * 64 + sizeof(FileMetadata_t), inode->blockPointers, sizeof(unsigned short) * 8);
 	return buffer;
 }
