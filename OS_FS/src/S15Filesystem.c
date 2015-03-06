@@ -36,6 +36,32 @@ static VBS_Type *virtualBlockStorage;
 
 static Inode_t inodes[INODE_NUM];
 
+static void initDir(Directory_t* dir){
+	dir->entries = malloc(DIR_E_T_SIZE*10);
+	dir->size = 0;
+}
+
+static int addDirectoryEntry(Directory_t* dir, const char* filename, unsigned char inodeIdx){
+	if(dir.size >= DIRE_E_T_SIZE*10){
+		perror("directory is full");
+		return DIRECTORY_FULL;
+	}
+	
+	if(strlen(filename) > MAX_FILENAME_LEN){
+		perror("Name too long, shorten to less than MAX_FILENAME_LEN");
+		return INVALID_PATH;
+	}
+	DirectoryEntry_t dirE;
+	dirE.filename = malloc(sizeof(char)*MAX_FILENAME_LEN+1);
+	memcpy(dirE.filename, filename, sizeof(char)*MAX_FILENAME_LEN+1);
+	dirE.inodeIdx = inodeIdx;
+	
+	memcpy(dir->entries + size, &dirE, DIR_E_T_SIZE);
+	dir.size += DIR_E_T_SIZE;
+	
+	return 1;
+}
+
 static char* packDirectoryEntrys(DirectoryEntry_t* dirE){
 	char* buffer = malloc(DIR_E_T_SIZE *10);
 	int i;
@@ -210,15 +236,21 @@ int fs_mount() {
 	rootInode.metaData.fileLinked = FILE_LINKED;
 	rootInode.blockPointers[0] = FS_FIRST_BLOCK_IDX;
 	inodes[0] = rootInode;
+
+	short error = -1;
 	
-	Directory_t rootDir;
-	rootDir.size = sizeof(DirectoryEntry_t);
+	Directory_t rootDir = initDir;
+	error = addDirectoryEntry(rootDir, toorInode.fileName, 0);
+	if(error < 1){
+		perror("Initilizing the directory fialed");
+		return MOUNT_FAILURE;
+	}
 	FS_Block_t rootBlock;
 	rootBlock.validBytes = DIR_T_SIZE;
 	rootBlock.nextBlockIdx = 0;
 	memcpy(&(rootBlock.dataBuffer), packDirectory(&rootDir), DIR_T_SIZE);
 	
-	short error = -1;
+
 	
 	memcpy(loader.buffer, packFSBlock(&rootBlock), FS_BLOCK_T_SIZE);
 	
