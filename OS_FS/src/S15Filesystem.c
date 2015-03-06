@@ -52,7 +52,6 @@ static int addDirectoryEntry(Directory_t* dir, const char* filename, unsigned ch
 		return INVALID_PATH;
 	}
 	DirectoryEntry_t dirE;
-	dirE.filename = malloc(sizeof(char)*MAX_FILENAME_LEN+1);
 	memcpy(dirE.filename, filename, sizeof(char)*MAX_FILENAME_LEN+1);
 	dirE.inodeIdx = inodeIdx;
 	
