@@ -475,7 +475,7 @@ int fs_remove_file(const char* absoluteFilename) {
 	int i;
 	for(i = 0; i < 10; i++){
 		if(strcmp(filename, (*dirEntry).filename)){
-			Inode_t inode = inodes[(*dirEntry).filename];
+			Inode_t inode = inodes[(*dirEntry).inodeIdx];
 			inode.metaData.fileLinked = FILE_UNLINKED;
 			error = eraseFile(inode);
 			if(error < 1){
