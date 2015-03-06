@@ -49,7 +49,7 @@ static char* packDirectoryEntrys(DirectoryEntry_t* dirE){
 }
 
 static DirectoryEntry_t* unpackDirectoryEntrys(char* dataBuffer){
-	DirectoryEntry_t* entries;
+	DirectoryEntry_t* entries = malloc(DIR_E_T_SIZE*10);
 	DirectoryEntry_t* walker = entries;
 	int i;
 	for(i=0;i<10;i++){
