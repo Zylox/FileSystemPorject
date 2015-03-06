@@ -412,7 +412,7 @@ int fs_seek_within_file (const char* absoluteFilename, unsigned int offset, unsi
 
 int fs_remove_file(const char* absoluteFilename) {
 	char *dirPath, *filename;
-	
+	int error = -1;
 	error = splitFileAndDirPath(absoluteFilename, &dirPath, &filename);
 	if(error < 1){
 		return INVALID_PATH;
